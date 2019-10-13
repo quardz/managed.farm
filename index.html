@@ -1,0 +1,368 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Quardz Managed Farms</title>
+
+<meta name="viewport" content="initial-scale=1, maximum-scale=1">
+
+
+    <link href="https://fonts.googleapis.com/css?family=Red+Hat+Text:400,500,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="node_modules/angularjs-slider/dist/rzslider.min.css"/>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="node_modules/angular/angular.js"></script>
+    <script src="node_modules/angularjs-slider/dist/rzslider.min.js"></script>
+    <script src="index.js"></script>
+  </head>
+  <body>
+    <div ng-app="myApp" ng-controller="myCtrl" ng-init = "calculate()" class = "myApp">
+      <div class = "welcomesection clearfix text-center">
+        <h1>Quardz Agro Investments</h1>
+        <div class = "desc">
+          Invest in high yield agro farms. Earn Interest + Profit share. 
+        </div>
+        <div class = "contact">
+          Contact : Arasu | Phone : 86104 13807 | Email adal@quardz.com 
+        </div>        
+      </div>
+    
+    
+      <div class = "mainwrap clearfix">
+        <div class = "mainbox ">
+          <div class = "header text-center clearfix">
+            <div class = "content">
+              Investing {{ amount_invested| INR }} will gives you <strong>{{ total_earnings|INR }}</strong> in {{ in_year }} years.
+            </div>
+          </div>
+          <div class = "sliders clearfix">
+            <div class = "sliders-inner">
+              <span class = "bankreturn">Bank return {{ bank_return|INR }} </span>
+              <div class = "clearfix sliderwrap-year sliderwrap-land">
+                <span class = "slider-head">Years</span>
+                <rzslider rz-slider-model="slider_year.value" rz-slider-options="slider_year.options" ></rzslider>
+              </div>
+              <div class = "clearfix sliderwrap-land">
+                <span class = "slider-head">Land in Acres</span>
+                <span class = "slider-slide">
+                  <rzslider rz-slider-model="slider_land.value" rz-slider-options="slider_land.options" ></rzslider>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class = "details clearfix">
+            <div class  = "item item-interest">
+              <div class = "item-inner">
+                <span class = "tit">Interest ({{ interest_rate_pa }}%)</span>
+                <span class = "val">{{interest_amount|INR}}</span>       
+                <span class = "symbol">+</span>
+              </div>
+            </div>
+            <div class  = "item item-profit">
+              <div class = "item-inner">
+                <span class = "tit">Est. Profit share from Agri ({{ profit_share_percent }}%)</span>
+                <span class = "val">{{est_profit_from_agri|INR}} </span>         
+                <span class = "symbol">=</span>                   
+              </div>
+            </div>
+            <div class  = "item item-total">
+              <div class = "item-inner">
+                <span class = "tit">Total Earnings ({{ roi }}%)</span>
+                <span class = "val">{{total_earnings|INR}}</span>              
+              </div>
+            </div>
+          </div>
+          <div class = "footer clearfix">
+            <div class = "footer-inner">
+              <div class = "footer-left">
+                Win win for everyone. Farmers get long term loan with cheap interest. You get better ROI + Profit share. 
+              </div>
+              <div class = "footer-right">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class = "yearreturns clearfix">
+        <div class = "returntable-wrap">
+          <table class = "mf-table">
+            <thead>
+              <tr class = "investselect">
+                <th colspan = "6">
+                  <select ng-model="selected_land" dng-init = "_land = '1'" ng-change="computeyeartable()" class = "select-css">
+                    <option ng-repeat="(_land, _value) in land_invest" ng-value="_land">Invest {{_value | INR}} ( {{ _land }} acre  or {{_land*100}} Cents)</option>
+                  </select>
+                </th>
+              </tr>
+              <tr>
+                <th>Years</th>
+                <th ng-repeat="(year, year_obj) in in_years">{{year}} years</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class = "t-bankint">
+                <th>Bank Interest p.a</th>
+                <td ng-repeat="(year, year_obj) in in_years">{{year_obj.bank_interest}}%</td>
+              <tr>
+              <tr class = "t-ourint">
+                <th>Our Interest p.a</th>
+                <td ng-repeat="(year, year_obj) in in_years">{{year_obj.interest_pa}}%</td>
+              <tr>
+              <tr class = "t-landprofit">
+                <th>Est. Profit from Land</th>
+                <td ng-repeat="(year, year_obj) in in_years">{{ cal_est_profit(year, 1, false)|INR }}</td>
+              <tr>
+              <tr class = "t-profitshare">
+                <th>Your Profit Share %</th>
+                <td ng-repeat="(year, year_obj) in in_years">{{year_obj.profit_share}}%</td>
+              <tr>
+              <tr class = "t-profitshareamount">
+                <th>Your Profit Share</th>
+                <td ng-repeat="(year, year_obj) in in_years">{{cal_est_profit(year, 1, year_obj.profit_share) * selected_land|INR}}</td>
+              <tr>          
+              <tr class = "t-ourintearn">
+                <th>Our Interest Earning</th>
+                <td ng-repeat="(year, year_obj) in in_years">{{ table_invest * (year_obj.interest_pa / 100) * year| INR}}</td>
+              <tr>
+              <tr class = "t-bankearn">
+                <th>Bank Interest Earning</th>
+                <td ng-repeat="(year, year_obj) in in_years">{{ table_invest * (year_obj.bank_interest / 100) * year | INR}}</td>
+              <tr>          
+              <tr class = "t-ourtotalearn">
+                <th>Our Total Earnings</th>
+                <td ng-repeat="(year, year_obj) in in_years">{{ (cal_est_profit(year, 1, year_obj.profit_share)) + (table_invest * (year_obj.interest_pa / 100) * year) | INR}}</td>
+              <tr>
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan = 6>* Yes Bank provide Highest interest rate of 7.95% p.a.</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+      
+      <div class = "yearreturns crops clearfix">
+        <div class = "returntable-wrap">
+          <table class = "mf-table">
+            <thead>
+              <tr class = "investselect" style = "display:none">
+                <th colspan = "6">
+
+                </th>
+              </tr>
+              <tr>
+                <th>Crops per acre</th>
+                <th ng-repeat="(year, year_obj) in in_years">{{year}} years</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class = "t-bankint">
+                <th>Money trees (25 cents)
+                <span>Less water / Less Effort / High one time returns</span>
+                </th>
+                <td ng-repeat="(year, year_obj) in in_years" class = "farm-year-{{year}}">{{year_obj.agri_returns.fast_growing_trees.est_return | INR}}</td>
+              <tr>
+              <tr class = "t-bankint">
+                <th>Fruits (25 cents)
+                <span>Decent regular income from 5th year.</span>
+                </th>
+                <td ng-repeat="(year, year_obj) in in_years" class = "farm-year-{{year}}">{{year_obj.agri_returns.fruits_regular_income.est_return | INR}}</td>
+              <tr>
+              <tr class = "t-bankint">
+                <th>Vegetables (25 cents)
+                <span>Regular and high return</span>
+                </th>
+                <td ng-repeat="(year, year_obj) in in_years" class = "farm-year-{{year}}">{{year_obj.agri_returns.veg_regular_income.est_return | INR}}</td>
+              <tr>
+              <tr class = "t-bankint">
+                <th>Other Crops (25 cents)
+                <span>Sessional Opportunities</span>
+                </th>
+                <td ng-repeat="(year, year_obj) in in_years" class = "farm-year-{{year}}">{{year_obj.agri_returns.other_crops.est_return | INR}}</td>
+              <tr>
+              <tr class = "t-bankint">
+                <th>Live stocks
+                <span>Chicken, Cow, Buffalo, Goat etc</span>
+                </th>
+                <td ng-repeat="(year, year_obj) in in_years" class = "farm-year-{{year}}">{{year_obj.agri_returns.live_stocks.est_return | INR}}</td>
+              <tr>
+              <tr class = "t-total">
+                <th>Total Profit per Acre
+                <span>Estimated is minimum profit after expanses</span>
+                </th>
+                <td ng-repeat="(year, year_obj) in in_years" class = "farm-year-{{year}}">{{ cal_est_profit(year, 1, 100) | INR}}</td>
+              <tr>
+            </tbody>
+
+          </table>
+        </div>
+      </div>      
+   
+       <div class = "contentfooter clearfix text-center">
+        <ul>
+          <li>We use latest tools, equipments and technology to do efficient farming. </li>
+          <li>Our water management ensures crops for 365 days</li>
+          <li>We use organic manure from our live stock. No fertilizer cost.</li>
+          <li>Large scale direct export ensures higher margin.</li>                    
+          <li></li>          
+        </ul>
+   
+      </div>
+ 
+    </div>
+    <!-- ng --!>
+    <script>
+      var app = angular.module('myApp', ['rzSlider']);
+      app.controller('myCtrl', function($scope) {
+        $scope.in_years = years;
+        $scope.land_invest = land_invest;
+        $scope.in_year= 5;
+        $scope.in_land= 1;
+        $scope.acres = 1;
+        $scope.table_invest = 700000; // Default 1 acre
+        $scope.selected_land = "1";
+        
+      $scope.slider_land = {
+        value: 1,
+        options: {
+          showTicksValues: true,
+          onChange: slider_onchange,
+          stepsArray: [
+            {value: 0.05, legend: '0.05'},
+            {value: 0.10, legend: '0.10'},
+            {value: 0.25, legend: '0.25'},
+            {value: 0.50, legend: '0.50'},
+            {value: 1.00, legend: '1.00'},
+            {value: 2.00, legend: '2.00'},
+            {value: 3.00, legend: '3.00'},
+            {value: 5.00, legend: '5.00'},
+          ]
+        }
+      }; 
+        
+      $scope.slider_year = {
+        value: 5,
+        options: {
+          showTicksValues: true,
+          onChange: slider_onchange,
+          stepsArray: [
+            {value: 2, legend: '2'},
+            {value: 3, legend: '3'},
+            {value: 4, legend: '4'},
+            {value: 5, legend: '5'},
+            {value: 7, legend: '7'},
+          ]
+        }
+      };  
+      
+
+      
+      $scope.computeyeartable = function() {
+        $scope.table_invest = $scope.land_invest[$scope.selected_land];
+      }
+      
+        function slider_onchange() {
+          $scope.in_year = $scope.slider_year.value;
+          if($scope.slider_land.value > 1) {
+            $scope.acres = $scope.slider_land.value;
+            $scope.in_land = 1;
+          }
+          else {
+            $scope.in_land = $scope.slider_land.value;    
+            $scope.acres = 1;
+          }
+          $scope.calculate();
+        }
+        $scope.cal_est_profit = function(year, acres, percent) {
+          var agri_return_per_acre = 0;
+          for(item in items) {
+            agri_return_per_acre = $scope.in_years[year].agri_returns[items[item]].est_return + agri_return_per_acre;
+          }          
+          profit = parseInt(agri_return_per_acre * acres);
+          if(percent) {
+            return parseInt(profit * (percent/100));
+          }
+          return profit;
+        }
+        // This calculates return from agri
+        //Total amount invested, number of years, number of 
+        function agri_profit_calc(
+          total_return_per_acer_given_year,
+          nof_acres,
+          return_percent
+          ) {
+          
+          //get total return per acer for given year. 
+          //Multiply into number of acers. 
+          //return the profit sharing
+        }
+      
+        
+        $scope.calculate = function() {
+          $scope.amount_invested = $scope.land_invest[$scope.in_land] * $scope.acres;
+          $scope.interest_rate_pa = $scope.in_years[$scope.in_year].interest_pa;
+          $scope.interest_amount = parseInt(($scope.amount_invested * ($scope.interest_rate_pa / 100)) *   $scope.in_year);
+          $scope.profit_share_percent = $scope.in_years[$scope.in_year].profit_share;
+      
+          $scope.est_profit_from_agri = 0;
+          
+          no_of_lakhs = $scope.amount_invested / $scope.amount_invested;
+          
+          
+          agri_return_per_acre = 0;
+          for(item in items) {
+            agri_return_per_acre = $scope.in_years[$scope.in_year].agri_returns[items[item]].est_return + agri_return_per_acre;
+          }
+          $scope.est_profit_from_agri = agri_return_per_acre * $scope.in_land ;
+          
+          $scope.total_earnings = ($scope.est_profit_from_agri * ($scope.profit_share_percent/100) ) + $scope.interest_amount;
+          $scope.total_maturity_amount = $scope.total_earnings + $scope.amount_invested;
+          $scope.roi = parseInt(($scope.total_earnings / $scope.amount_invested) * 100);
+          $scope.bank_return = parseInt(($scope.amount_invested * ($scope.in_years[$scope.in_year].bank_interest/100) * $scope.in_year));
+        }  
+      
+      });
+      
+      app.filter('toArray', function () {
+      return function (obj, addKey) {
+      if (!angular.isObject(obj)) return obj;
+      if ( addKey === false ) {
+      return Object.keys(obj).map(function(key) {
+        return obj[key];
+      });
+      } else {
+      return Object.keys(obj).map(function (key) {
+        var value = obj[key];
+        return angular.isObject(value) ?
+          Object.defineProperty(value, '$key', { enumerable: false, value: key}) :
+          { $key: key, $value: value };
+      });
+      }
+      };
+      });     
+      
+      app.filter('INR', function () {        
+      return function (input) {
+        if (! isNaN(input)) {
+            input = parseInt(input);
+            var currencySymbol = '₹';
+            //var output = Number(input).toLocaleString('en-IN');   <-- This method is not working fine in all browsers!           
+            var result = input.toString().split('.');
+      
+            var lastThree = result[0].substring(result[0].length - 3);
+            var otherNumbers = result[0].substring(0, result[0].length - 3);
+            if (otherNumbers != '')
+                lastThree = ',' + lastThree;
+            var output = otherNumbers.replace(/\B(?=(\d{2})+(?!\d))/g, ",") + lastThree;
+            
+            if (result.length > 1) {
+                output += "." + result[1];
+            }            
+            
+            return currencySymbol + output;
+        }
+      }
+      });      
+      
+    </script>
+  </body>
+</html>
