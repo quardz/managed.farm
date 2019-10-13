@@ -358,8 +358,10 @@ color: #447ecc;
     line-height: 2;
     width: 740px;
     margin-left: 0;
-    padding: 0;
+    padding-left: 45px;
     text-align: left;
+    margin: 0 auto;
+    padding-top: 45px;
 }
 
 @media (max-width: 746px) { 
