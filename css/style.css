@@ -377,6 +377,19 @@ color: #447ecc;
   .mf-table {
     min-width: 740px;
   }
+  
+  .details .item {
+  width: 100%;
+    float: left;
+    margin-bottom: 45px;
+  }
+  .details .item .item-inner .symbol {
+    right: auto;
+    top: 30px;
+    left: 0;
+    text-align: center;
+    width: 100%;
+  }
 
 }
 
