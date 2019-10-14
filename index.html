@@ -21,7 +21,7 @@
           Invest in high yield agro farms. Earn Interest + Profit share. 
         </div>
         <div class = "contact">
-          Contact : Arasu | Phone : 86104 13807 | Email adal@quardz.com 
+          Contact : Adal Arasu | Phone : 9901357171 | Email adal@quardz.com 
         </div>        
       </div>
     
@@ -58,8 +58,8 @@
             </div>
             <div class  = "item item-profit">
               <div class = "item-inner">
-                <span class = "tit">Est. Profit share from Agri ({{ profit_share_percent }}%)</span>
-                <span class = "val">{{est_profit_from_agri|INR}} </span>         
+                <span class = "tit">Your Min. Profit share from Agri ({{ profit_share_percent }}%)</span>
+                <span class = "val">{{profit_for_investor|INR}} </span>         
                 <span class = "symbol">=</span>                   
               </div>
             </div>
@@ -315,6 +315,7 @@
           }
           $scope.est_profit_from_agri = agri_return_per_acre * $scope.in_land ;
           
+          $scope.profit_for_investor = parseInt($scope.est_profit_from_agri * ($scope.profit_share_percent/100) );
           $scope.total_earnings = ($scope.est_profit_from_agri * ($scope.profit_share_percent/100) ) + $scope.interest_amount;
           $scope.total_maturity_amount = $scope.total_earnings + $scope.amount_invested;
           $scope.roi = parseInt(($scope.total_earnings / $scope.amount_invested) * 100);
